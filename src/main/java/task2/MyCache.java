@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class MyCache implements InvocationHandler {
 
     private final Object target;
-    private final Map<Method, Object> cache = new HashMap<>();
+    private final Map<Method, CachedResult> cache = new HashMap<>();
     private final Map<Class<? extends Annotation>, Set<String>> annotatedMethods = new HashMap<>();
 
     public MyCache(Object object) {
@@ -45,8 +45,8 @@ public class MyCache implements InvocationHandler {
         boolean toCache = false;
 
         if (isMethodAnnotated(method, Cache.class)) {
-            if (cache.containsKey(method)) {
-                return cache.get(method);
+            if (isResultCached(method, args)) {
+                return getResultFromCache(method);
             } else
                 toCache = true;
 
@@ -56,9 +56,25 @@ public class MyCache implements InvocationHandler {
 
         Object result = method.invoke(target, args);
         if (toCache)
-            cache.put(method, result);
+            putResultToCache(method, args, result);
 
         return result;
+    }
+
+    private void putResultToCache(Method method, Object[] args, Object result) {
+        cache.put(method, new CachedResult(result, args));
+    }
+
+    private Object getResultFromCache(Method method) {
+        return cache.get(method).getResult();
+    }
+
+    private boolean isResultCached(Method method, Object[] args) {
+        if (!cache.containsKey(method))
+            return false;
+
+        CachedResult cachedResult = cache.get(method);
+        return Arrays.equals(cachedResult.getCallParameters(), args);
     }
 
     private boolean isMethodAnnotated(Method method, Class<? extends Annotation> annotation) {

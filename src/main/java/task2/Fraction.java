@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public class Fraction implements Fractionable {
     @Getter
-    private int cacheUsedCounter = 0;
+    private int originalMethodCalledCounter = 0;
 
     private int num;
     private int denum;
@@ -17,14 +17,21 @@ public class Fraction implements Fractionable {
     @Cache
     @Override
     public double doubleValue() {
-        cacheUsedCounter++;
+        originalMethodCalledCounter++;
         return (double) num / denum;
+    }
+
+    @Cache
+    @Override
+    public double doubleValue(int value, String comment) {
+        originalMethodCalledCounter++;
+        return (double) (num / denum) + value;
     }
 
     @Mutator
     @Override
     public void setNum(int num) {
-        cacheUsedCounter = 0;
+        originalMethodCalledCounter = 0;
         this.num = num;
     }
 
@@ -32,7 +39,7 @@ public class Fraction implements Fractionable {
     @Mutator
     @Override
     public void setDenum(int denum) {
-        cacheUsedCounter = 0;
+        originalMethodCalledCounter = 0;
         this.denum = denum;
     }
 }

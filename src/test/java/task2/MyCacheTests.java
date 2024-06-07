@@ -8,12 +8,12 @@ public class MyCacheTests {
     void should_ReturnValueFromCache_When_CallCachedMethodSecondAndMoreTimes() {
         Fraction fraction = new Fraction(4, 8);
         Fractionable fractionable = Utils.cache(fraction);
-        Assertions.assertEquals(0, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(0, fraction.getOriginalMethodCalledCounter());
         fractionable.doubleValue();
-        Assertions.assertEquals(1, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(1, fraction.getOriginalMethodCalledCounter());
         fractionable.doubleValue();
         fractionable.doubleValue();
-        Assertions.assertEquals(1, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(1, fraction.getOriginalMethodCalledCounter());
     }
 
     @Test
@@ -33,13 +33,28 @@ public class MyCacheTests {
         fractionable.doubleValue();
         fractionable.doubleValue();
         fractionable.doubleValue();
-        Assertions.assertEquals(1, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(1, fraction.getOriginalMethodCalledCounter());
 
         fractionable.setNum(10);
-        Assertions.assertEquals(0, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(0, fraction.getOriginalMethodCalledCounter());
         fractionable.doubleValue();
-        Assertions.assertEquals(1, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(1, fraction.getOriginalMethodCalledCounter());
         fractionable.setDenum(10);
-        Assertions.assertEquals(0, fraction.getCacheUsedCounter());
+        Assertions.assertEquals(0, fraction.getOriginalMethodCalledCounter());
+    }
+
+    @Test
+    void should_UpdateCache_When_CallCachedMethodWithDifferentParams() {
+        Fraction fraction = new Fraction(4, 8);
+        Fractionable fractionable = Utils.cache(fraction);
+
+        fractionable.doubleValue(10, "comment");
+        fractionable.doubleValue(10, "comment");
+        Assertions.assertEquals(1, fraction.getOriginalMethodCalledCounter());
+        fractionable.doubleValue(20, "comment");
+        fractionable.doubleValue(20, "comment");
+        fractionable.doubleValue(20, "comment");
+        Assertions.assertEquals(2, fraction.getOriginalMethodCalledCounter());
+
     }
 }
