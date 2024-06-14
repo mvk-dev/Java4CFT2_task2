@@ -2,6 +2,9 @@ package task2;
 
 import lombok.Getter;
 
+/**
+ *
+ */
 public class Fraction implements Fractionable {
     @Getter
     private int originalMethodCalledCounter = 0;
